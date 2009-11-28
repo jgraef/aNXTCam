@@ -1,0 +1,13 @@
+First check the dependencies:
+ * Gtk+
+ * termcap
+ * pthread
+
+Type 'make', to compile.
+Then type './anxtcam' to run aNXTCam
+
+Also check out our website:
+http://www.janosch-graef.org/anxt
+
+or write an email:
+janosch.graef@gmx.net

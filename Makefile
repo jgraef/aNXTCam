@@ -1,12 +1,12 @@
 CFLAGS = -Iinclude/ \
          -Iwidgets/include \
          -Iiniparser/include \
-         `gtk-config --cflags` `pkg-config --cflags gmodule-2.0` \
+         `pkg-config --cflags gtk+-2.0` \
          -D_GNU_SOURCE=1
 
 LDFLAGS = -Lwidgets/ -lcolorrange_widget -lcolorrange -lcolorpreview \
           -Liniparser/ -liniparser \
-          `gtk-config --libs gtk gthread` `pkg-config --libs gmodule-2.0` \
+          `pkg-config --libs gtk+-2.0 gthread-2.0 gmodule-2.0` \
           -lpthread \
           -lm
 

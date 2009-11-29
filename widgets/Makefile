@@ -1,5 +1,5 @@
 CFLAGS = -Iinclude/ \
-         `gtk-config --cflags` `pkg-config --cflags gmodule-2.0` \
+         `pkg-config --cflags gtk+-2.0` \
          -D_GNU_SOURCE=1
 DEPENDFILE = .depend
 

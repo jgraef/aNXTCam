@@ -26,8 +26,12 @@ SRC = colormap.c com.c device.c frame.c main.c \
 
 all: dep widgets iniparser anxtcam
 
+dep: $(SRC)
+	$(CC) $(CFLAGS) -MM $(SRC) > $(DEPENDFILE)
+
 clean:
 	rm -f anxtcam
+	rm -f $(DEPENDFILE)
 	make -C widgets/ clean
 	make -C iniparser/ clean
 

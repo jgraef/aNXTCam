@@ -1,2 +1,0 @@
-dictionary.o: dictionary.c include/dictionary.h
-iniparser.o: iniparser.c include/iniparser.h include/dictionary.h

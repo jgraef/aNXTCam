@@ -20,5 +20,6 @@ libiniparser.a: $(OBJ)
 
 clean:
 	rm -f libiniparser.a $(OBJ)
+	rm -f $(DEPENDFILE)
 
 -include $(DEPENDFILE)

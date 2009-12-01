@@ -1,4 +1,5 @@
-#.*
+# to view excluded files that have been added to git before, use
+# "git ls-files -i --exclude-standard"
 *.o
 *.o.*
 *.a

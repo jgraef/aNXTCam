@@ -1561,8 +1561,8 @@ Janosch Gr&#xE4;f</property>
                   <object class="GtkFileChooserButton" id="file_device">
                     <property name="visible">True</property>
                     <property name="tooltip_text" translatable="yes">Choose COM device</property>
-                    <property name="preview_widget_active">False</property>
                     <property name="create_folders">False</property>
+                    <property name="preview_widget_active">False</property>
                     <property name="width_chars">16</property>
                   </object>
                   <packing>
@@ -1777,7 +1777,7 @@ Janosch Gr&#xE4;f</property>
     </child>
   </object>
   <object class="GtkWindow" id="win_colormap">
-    <property name="title" translatable="yes">aNXTView - Colors</property>
+    <property name="title" translatable="yes">aNXTCam - Colors</property>
     <property name="window_position">center-on-parent</property>
     <property name="type_hint">utility</property>
     <property name="transient_for">win_main</property>

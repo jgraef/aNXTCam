@@ -2,7 +2,8 @@ CFLAGS = -Iinclude/ \
          -Iwidgets/include \
          -Iiniparser/include \
          `pkg-config --cflags gtk+-2.0` \
-         -D_GNU_SOURCE=1
+         -D_GNU_SOURCE=1 \
+         -fstack-protector -fPIE -O2
 
 LDFLAGS = -Lwidgets/ -lcolorrange_widget -lcolorrange -lcolorpreview \
           -Liniparser/ -liniparser \

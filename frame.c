@@ -129,6 +129,11 @@ uint8_t nxtcam_frame_channel(nxtcam_frame_t frame,int x,int y,int channel) {
 
   p = nxtcam_frame_pixel(frame,x,y);
 
+	//Store the RGB Values in the global arrays created in frame.h
+	pixelArrayR[x][y] = p->r;
+	pixelArrayG[x][y] = p->g;
+	pixelArrayB[x][y] = p->b;
+
   switch (channel) {
     case NXTCAM_RGB_R:
       return p->r;

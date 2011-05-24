@@ -53,6 +53,7 @@ typedef struct {
 
   struct {
     GtkWidget *win;
+    GtkWidget *tolerance; //widget for the spin button for tolerance
     GtkWidget *box_colorrange;
     GtkWidget *box_colormap;
     GtkWidget *colorrange;

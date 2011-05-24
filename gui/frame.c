@@ -43,12 +43,13 @@ static GdkPixbuf *gui_frame_get_pixbuf(gui_gd_t *gd) {
 void gui_frame_update(gui_gd_t *gd) {
   GdkPixbuf *pixbuf;
   GdkPixbuf *pixbuf_big;
-  int w;
-  int h;
 
   if (GTK_WIDGET_VISIBLE(gd->frame.win)) {
     w = gd->frame.img_frame->allocation.width;
     h = gd->frame.img_frame->allocation.height;
+	
+//Get the "drawable" size of the image frame window and store the dimensions in the two global variables declared in the frame.h file
+    gdk_drawable_get_size(gtk_widget_get_window(gd->frame.img_frame),&winFrameWidth,&winFrameHeight);
 
     if (w<GUI_FRAME_MIN_WIDTH || h<GUI_FRAME_MIN_HEIGHT) {
       w = GUI_FRAME_MIN_WIDTH;
@@ -111,3 +112,4 @@ G_MODULE_EXPORT void gui_frame_pickcolor(GtkWidget *widget,gui_gd_t *gd) {
 G_MODULE_EXPORT void gui_frame_close(GtkWidget *widget,gui_gd_t *gd) {
   gtk_widget_hide(gd->frame.win);
 }
+

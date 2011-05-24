@@ -27,6 +27,8 @@
 #include "nxtcam/com.h"
 #include "nxtcam/device.h"
 #include "nxtcam/os.h"
+#include "nxtcam/frame.h" //include frame.h to reference constants
+#include "colorrange_widget/colorrange_widget.h"//include header to reference functions
 
 // Custom widgets
 #include "colorrange_widget/colorrange_widget.h"
@@ -101,8 +103,12 @@ G_MODULE_EXPORT void gui_main_ping(GtkWidget *widget,gui_gd_t *gd) {
 }
 
 G_MODULE_EXPORT void gui_main_capture(GtkWidget *widget,gui_gd_t *gd) {
-  gtk_widget_show(gd->frame.win);
-  gui_frame_capture(widget,gd);
+  if (nxtcam_com_is_connected()) {
+	gtk_widget_show(gd->frame.win);
+	gui_frame_capture(widget,gd);  }
+  else {
+    logmsg("NXTCam not connected\n");
+  }
 }
 
 G_MODULE_EXPORT void gui_main_abort(GtkWidget *widget,gui_gd_t *gd) {
@@ -118,7 +124,12 @@ G_MODULE_EXPORT void gui_main_colormap(GtkWidget *widget,gui_gd_t *gd) {
 }
 
 G_MODULE_EXPORT void gui_main_tracking(GtkWidget *widget,gui_gd_t *gd) {
-  gtk_widget_show(gd->tracking.win);
+  if (nxtcam_com_is_connected()) {
+    gtk_widget_show(gd->tracking.win);
+  }
+  else {
+    logmsg("NXTCam not connected\n");
+  }
 }
 
 G_MODULE_EXPORT void gui_main_about(GtkWidget *widget,gui_gd_t *gd) {
@@ -170,6 +181,68 @@ static gboolean gui_sync(gpointer data) {
 }
 
 /**
+ *Function for the Button Press Event on the image capture frame window
+**/
+static gboolean button_press_event_cb (GtkWidget *widget, GdkEventButton *event, gpointer data){
+	//pointer declarations
+	gui_gd_t *gd;
+	gd = (gui_gd_t*)data;
+	nxtcam_colormap_t colormap;
+	//calculated offsets take into acount the displacement from origin of the captured image and the scale of the image
+	gdouble xOffset = (winFrameWidth - w)/2;
+	gdouble yOffset = 25 + (winFrameHeight - 68 - h)/2;
+	//the corrected x,y coordinates of the point click with respect to the image stored in the pixelArray(s)
+	gint x = ((event->x)-xOffset)*NXTCAM_FRAME_WIDTH/w;
+	gint y = ((event->y)-yOffset)*NXTCAM_FRAME_HEIGHT/h;	
+
+	//Button check to specify that only the left click button is used and the actions are only executed if the click happens within the captured image
+	if (event->button == 1 && x <= NXTCAM_FRAME_WIDTH && x >= 0 && y <= NXTCAM_FRAME_HEIGHT && y >= 0) {
+		//obtain the RGB values at the x,y coordinates of the click
+		gint red = pixelArrayR[x][y];
+		gint green = pixelArrayG[x][y];
+		gint blue = pixelArrayB[x][y];
+
+		//obtain the tolerance from the spin-button in colormap.win
+		gdouble tol = gtk_spin_button_get_value (gd->colormap.tolerance)/200;
+
+		//calculate and store the low and hi RGB values based on the tolerance
+		gdouble rHi = red/255.0 + tol;
+		gdouble gHi = green/255.0 + tol;
+		gdouble bHi = blue/255.0 + tol;
+		gdouble rLow = red/255.0 - tol;
+		gdouble gLow = green/255.0 - tol;
+		gdouble bLow = blue/255.0 - tol;
+
+		//correction if the tolerance puts the slider above or below the bounds
+		if (rHi > 1) rHi = 1;
+		if (gHi > 1) gHi = 1;
+		if (bHi > 1) bHi = 1;
+		if (rLow < 0) rLow = 0;
+		if (gLow < 0) gLow = 0;
+		if (bLow < 0) bLow = 0;
+
+		//show the colormap widget and get the int of the tab currently open
+		gtk_widget_show(gd->colormap.win);
+		ColorRangeWidget *crange;
+		crange = COLOR_RANGE_WIDGET(gd->colormap.colorrange);
+		gint tabnum = color_range_get_current_tab(crange);
+
+		//change the title of the colormap.win to the RGB and (X,Y)
+		char *title;
+		asprintf(&title,"aNXTCam - RGB [%i,%i,%i] at X,Y (%i,%i)",red,green,blue,x,y);
+		gtk_window_set_title(GTK_WINDOW(gd->colormap.win),title);
+		free(title);
+
+		//set the low and high colors of the slider in the color range
+		color_range_widget_set_color_low(crange,tabnum,rLow,gLow,bLow);
+		color_range_widget_set_color_high(crange,tabnum,rHi,gHi,bHi);
+		return TRUE;
+	}
+	else return FALSE;
+}
+
+
+/**
  * Initializes GUI
  *  @param argc Reference for argc
  *  @param argv Reference for argv
@@ -205,6 +278,7 @@ gui_gd_t *gui_init(int *argc,char ***argv) {
 
   // Load widgets for colormap window
   gd->colormap.win = GUI_GET_WIDGET(builder,"win_colormap");
+  gd->colormap.tolerance = GUI_GET_WIDGET(builder,"spinbtn_colormap"); //widget created for tolerance spin button
   gd->colormap.box_colorrange = GUI_GET_WIDGET(builder,"box_colorrange");
   gd->colormap.colorrange = color_range_widget_new();
   gtk_box_pack_start(GTK_BOX(gd->colormap.box_colorrange),gd->colormap.colorrange,1,1,0);
@@ -218,6 +292,9 @@ gui_gd_t *gui_init(int *argc,char ***argv) {
   gd->frame.img_frame = GUI_GET_WIDGET(builder,"img_frame");
   gd->frame.chkbtn_interpolate = GUI_GET_WIDGET(builder,"chkbtn_interpolate");
   gd->frame.aspect_frame = GUI_GET_WIDGET(builder,"aspect_frame");
+  g_signal_connect (G_OBJECT(gd->frame.win), "button-press-event", G_CALLBACK(button_press_event_cb), gd); //executes the button press function
+  gtk_widget_set_events(G_OBJECT(gd->frame.win), gtk_widget_get_events (G_OBJECT(gd->frame.win))|GDK_BUTTON_PRESS_MASK);//button mask for the button press
+
 
   // Load widgets for tracking window
   gd->tracking.win = GUI_GET_WIDGET(builder,"win_tracking");

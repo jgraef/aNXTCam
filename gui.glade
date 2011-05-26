@@ -771,6 +771,12 @@ Janosch Gräf</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-dialog-warning</property>
   </object>
+  <object class="GtkAdjustment" id="spinBtnAdjustment">
+    <property name="upper">100</property>
+    <property name="value">10</property>
+    <property name="step_increment">0.5</property>
+    <property name="page_increment">2</property>
+  </object>
   <object class="GtkWindow" id="win_colormap">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">aNXTCam - Colors</property>
@@ -1011,7 +1017,7 @@ Janosch Gräf</property>
                 <property name="secondary_icon_activatable">False</property>
                 <property name="primary_icon_sensitive">True</property>
                 <property name="secondary_icon_sensitive">True</property>
-                <property name="adjustment">adjustment4</property>
+                <property name="adjustment">spinBtnAdjustment</property>
                 <property name="climb_rate">0.10000000000000001</property>
                 <property name="digits">1</property>
                 <property name="numeric">True</property>
@@ -1035,6 +1041,21 @@ Janosch Gräf</property>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="alertOverlap">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="width_chars">20</property>
+                <attributes>
+                  <attribute name="foreground" value="#ffff00000000"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
               </packing>
             </child>
           </object>

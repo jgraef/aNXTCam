@@ -30,6 +30,8 @@
 #include "nxtcam/colormap.h"
 #include "colorrange_widget/colorrange_widget.h"
 
+gdouble midTabRGB[3][8];//global variables of mean RGB values for each tab [R,G,B][tabindex]
+
 static void gui_colormap_update_title(gui_gd_t *gd) {
   char *title;
   char *path;
@@ -57,6 +59,14 @@ static void gui_colormap_gui2data(ColorRangeWidget *crange,nxtcam_colormap_t *co
   for (h=0;h<8;h++) {
     color_range_widget_get_color_low(crange,h,&rl,&gl,&bl);
     color_range_widget_get_color_high(crange,h,&rh,&gh,&bh);
+
+	//store the median of each RGB value for each tab
+	if (rh == 0 && rl == 0) midTabRGB[0][h] = NAN;
+	else midTabRGB[0][h] = (rh+rl)*255/2;
+	if (gh == 0 && gl == 0) midTabRGB[1][h] = NAN;
+	else midTabRGB[1][h] = (gh+gl)*255/2;
+	if (bh == 0 && bl == 0) midTabRGB[2][h] = NAN;
+	else midTabRGB[2][h] = (bh+bl)*255/2;
 
     for (i=0,j=0.;i<16;i++,j+=.0625) {
       if (j>=rl && j<rh) {
@@ -135,13 +145,45 @@ void gui_colormap_autoload(gui_gd_t *gd) {
   }
 }
 
+/*
+**Check for overlapping colors in all 8 tabs
+*/
+gboolean pixelOverlap(gui_gd_t *gd){
+	nxtcam_colormap_t colormap;
+
+	gui_colormap_gui2data(COLOR_RANGE_WIDGET(gd->colormap.colorrange),&colormap);
+	gtk_label_set_text(G_OBJECT(gd->colormap.alertOverlap),NULL);
+
+	int i = 0;
+	gboolean overlapExists = FALSE;
+	gdouble distance[8][8];
+	int count = 0;
+	for (i; i<8; i++){
+		int k = i+1;
+		for (k; k<8; k++){
+			distance[i][k] = sqrt(pow((midTabRGB[0][i]-midTabRGB[0][k]),2) + pow((midTabRGB[1][i]-midTabRGB[1][k]),2) +pow((midTabRGB[2][i]-midTabRGB[2][k]),2)); //Distance formula to calculate the distance between each point with the other
+			if (distance[i][k] <= 25) {
+				char *overlaps;
+				asprintf(&overlaps,"Overlapping Colors: %d & %d ",i+1,k+1);
+				gtk_label_set_text(G_OBJECT(gd->colormap.alertOverlap),overlaps);
+				free (overlaps);
+				overlapExists = TRUE;
+			}
+		}
+	}
+
+	return overlapExists;
+}
 
 void gui_colormap_upload(GtkWidget *widget,gui_gd_t *gd) {
   nxtcam_colormap_t colormap;
 
-  if (nxtcam_com_is_connected()) {
-    gui_colormap_gui2data(COLOR_RANGE_WIDGET(gd->colormap.colorrange),&colormap);
+  if (nxtcam_com_is_connected() && !pixelOverlap(gd)) { //if NXTCam is connected and there is no overlap
+   gui_colormap_gui2data(COLOR_RANGE_WIDGET(gd->colormap.colorrange),&colormap);
     nxtcam_dev_req_colormap(&colormap);
+  }
+  else if (nxtcam_com_is_connected() && pixelOverlap(gd)){ //if NXTCam is connected and there is overlap
+
   }
   else {
     gui_error(gd,"Could not upload colors","NXTCam not connected");

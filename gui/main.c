@@ -279,6 +279,7 @@ gui_gd_t *gui_init(int *argc,char ***argv) {
   // Load widgets for colormap window
   gd->colormap.win = GUI_GET_WIDGET(builder,"win_colormap");
   gd->colormap.tolerance = GUI_GET_WIDGET(builder,"spinbtn_colormap"); //widget created for tolerance spin button
+  gd->colormap.alertOverlap = GUI_GET_WIDGET(builder,"alertOverlap"); // widget to alert of overlapping colors
   gd->colormap.box_colorrange = GUI_GET_WIDGET(builder,"box_colorrange");
   gd->colormap.colorrange = color_range_widget_new();
   gtk_box_pack_start(GTK_BOX(gd->colormap.box_colorrange),gd->colormap.colorrange,1,1,0);

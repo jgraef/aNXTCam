@@ -54,6 +54,7 @@ typedef struct {
   struct {
     GtkWidget *win;
     GtkWidget *tolerance; //widget for the spin button for tolerance
+    GtkWidget *alertOverlap; //label to alert overlaping colors
     GtkWidget *box_colorrange;
     GtkWidget *box_colormap;
     GtkWidget *colorrange;

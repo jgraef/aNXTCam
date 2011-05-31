@@ -65,11 +65,5 @@ static __inline__ void nxtcam_frame_free(nxtcam_frame_t frame) {
 	int pixelArrayR[NXTCAM_FRAME_WIDTH][NXTCAM_FRAME_HEIGHT];
 	int pixelArrayG[NXTCAM_FRAME_WIDTH][NXTCAM_FRAME_HEIGHT];
 	int pixelArrayB[NXTCAM_FRAME_WIDTH][NXTCAM_FRAME_HEIGHT];
-	//Create the variable for the drawable dimensions of the image frame
-	int winFrameWidth;
-	int winFrameHeight;
-	//Global variables for the width and height of the actual image in the image frame
-	int w;
-	int h;
 
 #endif /* _NXTCAM_FRAME_H_ */

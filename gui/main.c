@@ -188,9 +188,20 @@ static gboolean button_press_event_cb (GtkWidget *widget, GdkEventButton *event,
 	gui_gd_t *gd;
 	gd = (gui_gd_t*)data;
 	nxtcam_colormap_t colormap;
-	//calculated offsets take into acount the displacement from origin of the captured image and the scale of the image
-	gdouble xOffset = (winFrameWidth - w)/2;
-	gdouble yOffset = 25 + (winFrameHeight - 68 - h)/2;
+	
+	gint w = gd->frame.img_frame->allocation.width;
+	gint h = gd->frame.img_frame->allocation.height;
+
+	//Create the variable for the drawable dimensions of the image frame	
+	gint winFrameWidth;
+	gint winFrameHeight;
+	//Get the "drawable" size of the image frame window and store the dimensions in the two global variables declared in the frame.h file
+	gdk_drawable_get_size(gtk_widget_get_window(gd->frame.img_frame),&winFrameWidth,&winFrameHeight);
+
+	//calculated offsets take into acount the displacement from origin of the captured image
+	gint xOffset = gd->frame.img_frame->allocation.x;
+	gint yOffset = gd->frame.img_frame->allocation.y;
+	
 	//the corrected x,y coordinates of the point click with respect to the image stored in the pixelArray(s)
 	gint x = ((event->x)-xOffset)*NXTCAM_FRAME_WIDTH/w;
 	gint y = ((event->y)-yOffset)*NXTCAM_FRAME_HEIGHT/h;	

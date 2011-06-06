@@ -31,8 +31,12 @@
   #define NXTCAM_OS_NAME           "Windows"
   #define NXTCAM_OS_DEFAULT_DEVICE "COM0"
 
-#else /* Default: Linux (Flag: "-D__LINUX__") */
+#elif(__LINUX__) /* Default: Linux (Flag: "-D__LINUX__") */
   #define NXTCAM_OS_NAME           "Linux"
+  #define NXTCAM_OS_DEFAULT_DEVICE "/dev/ttyUSB0"
+
+#elif(__APPLE__) /* Defualt: Mac OS X (Flag: "-D__APPLE__") */
+  #define NXTCAM_OS_NAME	   "Mac OS X"
   #define NXTCAM_OS_DEFAULT_DEVICE "/dev/ttyUSB0"
 
 #endif

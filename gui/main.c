@@ -267,6 +267,14 @@ gui_gd_t *gui_init(int *argc,char ***argv) {
   GError *error = NULL;
   gui_gd_t *gd;
 
+  //set working directory
+  char path[200];
+  char *p;
+  strcpy(path,argv[0][0]);
+  p = strrchr(path,'/');
+  *p = '\0';
+  chdir(path);
+
   // init Gtk
   gtk_init(argc,argv);
   g_thread_init(NULL);

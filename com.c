@@ -50,11 +50,14 @@ int nxtcam_com_open(const char *device) {
 
     // configure COM device
     tcgetattr(fd,&nxtcam_com.oldtio);
+	
     memset(&nxtcam_com.tio,0,sizeof(nxtcam_com.tio));
-    nxtcam_com.tio.c_cflag = B115200|CS8|CLOCAL|CREAD;
+    nxtcam_com.tio.c_cflag = CLOCAL|CREAD;
     nxtcam_com.tio.c_iflag = IGNPAR;
     nxtcam_com.tio.c_oflag = 0;
     nxtcam_com.tio.c_lflag = 0;//ICANON;
+    cfsetospeed(&nxtcam_com.tio,B115200);            // 115200 baud
+    cfsetispeed(&nxtcam_com.tio,B115200);            // 115200 baud
     tcflush(fd,TCIFLUSH);
     tcsetattr(fd,TCSANOW,&nxtcam_com.tio);
 
